@@ -3,25 +3,24 @@ import argparse
 import cv2
 import numpy as np
 
-cap_source = cv2.VideoCapture("data/webcam.mp4")
-cap_background = cv2.VideoCapture("data/praia.mp4")
+cap_source = cv2.VideoCapture("data/com.mp4")
+# the background will be static as it's a jpeg image, so we use imread and use the same frame for all the video
+frame_background = cv2.imread("data/background_office.jpeg")
 
 while True:
-    # Read a frame from the webcam and the background video
+    # Read a frame from the webcam
     ret_source, frame_source = cap_source.read()
-    ret_background, frame_background = cap_background.read()
-    
     # Check if the return is None
-    if not ret_source or not ret_background:
+    if not ret_source:
         break
     
     # If needed, resize the background to fit the source
     frame_background = cv2.resize(frame_background, (frame_source.shape[1], frame_source.shape[0]))
     
-    # Define boundaries for background color
-    lower_green = np.array([0, 100, 0], dtype = "uint8")
-    upper_green = np.array([100, 255, 100], dtype =  "uint8")
-    
+    # Define the background color as with the video matting with have a stable green color for the background
+    lower_green = np.array([0, 150, 40], dtype="uint8")
+    upper_green = np.array([180, 255, 150], dtype="uint8")
+
     # Create mask for background color
     mask = cv2.inRange(frame_source, lower_green, upper_green) 
     
@@ -46,5 +45,4 @@ while True:
     
 # When finished release the capture and destroy all windows
 cap_source.release()
-cap_background.release()
 cv2.destroyAllWindows()
